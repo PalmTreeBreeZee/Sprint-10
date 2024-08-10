@@ -1,4 +1,4 @@
-import React from 'react'
+import React, {useReducer} from 'react'
 
 const initialFormState = { // suggested
   fullName: '',
@@ -9,8 +9,21 @@ const initialFormState = { // suggested
   '4': false,
   '5': false,
 }
+const reducer = (state, action) => {
+  switch (action.type){
+    case CHANGE_FULLNAME:
+      return {...initialFormState, fullName: action.payload}
+    case CHANGE_SIZE: 
+      return {...initialFormState, size: action.payload}
+    default:
+      return state
+  }
+}
 
 export default function PizzaForm() {
+ const [state, dispatch] = useReducer(reducer, initialFormState)
+ const onNameChange = evt =>{}
+ const onSizeChange = evt =>{}
   return (
     <form>
       <h2>Pizza Form</h2>
@@ -26,6 +39,8 @@ export default function PizzaForm() {
             name="fullName"
             placeholder="Type full name"
             type="text"
+            value={state.fullName}
+            onChange={onNameChange}
           />
         </div>
       </div>
@@ -33,7 +48,7 @@ export default function PizzaForm() {
       <div className="input-group">
         <div>
           <label htmlFor="size">Size</label><br />
-          <select data-testid="sizeSelect" id="size" name="size">
+          <select data-testid="sizeSelect" id="size" name="size" value={state.size} onChange={onSizeChange}>
             <option value="">----Choose size----</option>
             <option value="S">Small</option>
             <option value="M">Medium</option>
