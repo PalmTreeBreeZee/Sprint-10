@@ -1,4 +1,11 @@
 import React, {useReducer} from 'react'
+const CHANGE_FULLNAME = 'CHANGE_FULLNAME'
+const CHANGE_SIZE = 'CHANGE_SIZE'
+const CHANGE_1 = 'CHANGE_1'
+const CHANGE_2 = 'CHANGE_2'
+const CHANGE_3 = 'CHANGE_3'
+const CHANGE_4 = 'CHANGE_4'
+const CHANGE_5 = 'CHANGE_5'
 
 const initialFormState = { // suggested
   fullName: '',
@@ -12,9 +19,19 @@ const initialFormState = { // suggested
 const reducer = (state, action) => {
   switch (action.type){
     case CHANGE_FULLNAME:
-      return {...initialFormState, fullName: action.payload}
+    return {...state, fullName: action.payload}
     case CHANGE_SIZE: 
-      return {...initialFormState, size: action.payload}
+      return {...state, size: action.payload}
+    case CHANGE_1: 
+      return {...state, '1': action.payload}
+    case CHANGE_2: 
+      return {...state, '2': action.payload}
+    case CHANGE_3: 
+      return {...state, '3': action.payload}
+    case CHANGE_4: 
+      return {...state, '4': action.payload}
+    case CHANGE_5: 
+      return {...state, '5': action.payload}
     default:
       return state
   }
@@ -22,8 +39,28 @@ const reducer = (state, action) => {
 
 export default function PizzaForm() {
  const [state, dispatch] = useReducer(reducer, initialFormState)
- const onNameChange = evt =>{}
- const onSizeChange = evt =>{}
+ const onNameChange = ({target: { value }})=>{
+   dispatch({type: CHANGE_FULLNAME, payload: value})
+ }
+ const onSizeChange = ({target: { value }})=>{
+  dispatch({type: CHANGE_SIZE, payload: value})
+ }
+ const on1Change = ({target: {value}}) =>{
+  dispatch({type: CHANGE_1, payload: !!value})
+ }
+ const on2Change = ({target: {value}}) =>{
+  dispatch({type: CHANGE_2, payload: !!value})
+ }
+ const on3Change = ({target: {value}}) =>{
+  dispatch({type: CHANGE_3, payload: !!value})
+ }
+ const on4Change = ({target: {value}}) =>{
+  dispatch({type: CHANGE_4, payload: !!value})
+ }
+ const on5Change = ({target: {value}}) =>{
+  dispatch({type: CHANGE_5, payload: !!value})
+ }
+ const reset = evt => {}
   return (
     <form>
       <h2>Pizza Form</h2>
@@ -59,19 +96,19 @@ export default function PizzaForm() {
 
       <div className="input-group">
         <label>
-          <input data-testid="checkPepperoni" name="1" type="checkbox" />
+          <input data-testid="checkPepperoni" name="1" type="checkbox" checked={state.CHANGE_1} onChange={on1Change}/>
           Pepperoni<br /></label>
         <label>
-          <input data-testid="checkGreenpeppers" name="2" type="checkbox" />
+          <input data-testid="checkGreenpeppers" name="2" type="checkbox" checked={state.CHANGE_2} onChange={on2Change}/>
           Green Peppers<br /></label>
         <label>
-          <input data-testid="checkPineapple" name="3" type="checkbox" />
+          <input data-testid="checkPineapple" name="3" type="checkbox" checked={state.CHANGE_3} onChange={on3Change}/>
           Pineapple<br /></label>
         <label>
-          <input data-testid="checkMushrooms" name="4" type="checkbox" />
+          <input data-testid="checkMushrooms" name="4" type="checkbox" checked={state.CHANGE_4} onChange={on4Change}/>
           Mushrooms<br /></label>
         <label>
-          <input data-testid="checkHam" name="5" type="checkbox" />
+          <input data-testid="checkHam" name="5" type="checkbox" checked={state.CHANGE_5} onChange={on5Change}/>
           Ham<br /></label>
       </div>
       <input data-testid="submit" type="submit" />
