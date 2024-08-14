@@ -1,4 +1,5 @@
 import React, {useReducer} from 'react'
+import { usePostAllOrdersMutation } from '../state/pizzaSlice'
 const CHANGE_FULLNAME = 'CHANGE_FULLNAME'
 const CHANGE_SIZE = 'CHANGE_SIZE'
 const CHANGE_1 = 'CHANGE_1'
@@ -10,12 +11,13 @@ const CHANGE_5 = 'CHANGE_5'
 const initialFormState = { // suggested
   fullName: '',
   size: '',
+  
   '1': false,
   '2': false,
   '3': false,
   '4': false,
   '5': false,
-}
+} 
 const reducer = (state, action) => {
   switch (action.type){
     case CHANGE_FULLNAME:
@@ -39,33 +41,35 @@ const reducer = (state, action) => {
 
 export default function PizzaForm() {
  const [state, dispatch] = useReducer(reducer, initialFormState)
+ const [createOrder, error, isLoading] = usePostAllOrdersMutation()
+ console.log(error)
  const onNameChange = ({target: { value }})=>{
    dispatch({type: CHANGE_FULLNAME, payload: value})
  }
  const onSizeChange = ({target: { value }})=>{
   dispatch({type: CHANGE_SIZE, payload: value})
  }
- const on1Change = ({target: {value}}) =>{
-  dispatch({type: CHANGE_1, payload: !!value})
+ const on1Change = () =>{
+  dispatch({type: CHANGE_1, payload: 'Pepperoni'})
  }
- const on2Change = ({target: {value}}) =>{
-  dispatch({type: CHANGE_2, payload: !!value})
+ const on2Change = () =>{
+  dispatch({type: CHANGE_2, payload: 'Green Peppers'})
  }
- const on3Change = ({target: {value}}) =>{
-  dispatch({type: CHANGE_3, payload: !!value})
+ const on3Change = () =>{
+  dispatch({type: CHANGE_3, payload: 'Pineapple'})
  }
- const on4Change = ({target: {value}}) =>{
-  dispatch({type: CHANGE_4, payload: !!value})
+  const on4Change = () =>{
+  dispatch({type: CHANGE_4, payload: 'Mushrooms'})
  }
- const on5Change = ({target: {value}}) =>{
-  dispatch({type: CHANGE_5, payload: !!value})
+ const on5Change = () =>{
+  dispatch({type: CHANGE_5, payload: 'Ham'})
  }
  const reset = evt => {}
   return (
     <form>
       <h2>Pizza Form</h2>
-      {true && <div className='pending'>Order in progress...</div>}
-      {true && <div className='failure'>Order failed: fullName is required</div>}
+      {isLoading && <div className='pending'>Order in progress...</div>}
+      {error && <div className='failure'>Order failed: {error.status}</div>}
 
       <div className="input-group">
         <div>
@@ -111,7 +115,7 @@ export default function PizzaForm() {
           <input data-testid="checkHam" name="5" type="checkbox" checked={state.CHANGE_5} onChange={on5Change}/>
           Ham<br /></label>
       </div>
-      <input data-testid="submit" type="submit" />
+      <input data-testid="submit" type="submit" onClick={() => createOrder(state)}/>
     </form>
   )
 }
