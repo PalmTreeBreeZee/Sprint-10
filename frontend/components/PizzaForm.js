@@ -1,75 +1,78 @@
-import React, {useReducer} from 'react'
-import { usePostAllOrdersMutation } from '../state/pizzaSlice'
+import React, { useReducer } from 'react'
+import { usePostAllOrdersMutation, useGetAllOrdersQuery } from '../state/pizzaSlice'
 const CHANGE_FULLNAME = 'CHANGE_FULLNAME'
 const CHANGE_SIZE = 'CHANGE_SIZE'
-const CHANGE_1 = 'CHANGE_1'
-const CHANGE_2 = 'CHANGE_2'
-const CHANGE_3 = 'CHANGE_3'
-const CHANGE_4 = 'CHANGE_4'
-const CHANGE_5 = 'CHANGE_5'
+const CHANGE_TOP = 'CHANGE_TOP'
+const RESETFORM = 'RESETFORM'
 
 const initialFormState = { // suggested
   fullName: '',
   size: '',
-  
+
   '1': false,
   '2': false,
   '3': false,
   '4': false,
-  '5': false,
-} 
+  '5': false
+}
 const reducer = (state, action) => {
-  switch (action.type){
+  switch (action.type) {
     case CHANGE_FULLNAME:
-    return {...state, fullName: action.payload}
-    case CHANGE_SIZE: 
-      return {...state, size: action.payload}
-    case CHANGE_1: 
-      return {...state, '1': action.payload}
-    case CHANGE_2: 
-      return {...state, '2': action.payload}
-    case CHANGE_3: 
-      return {...state, '3': action.payload}
-    case CHANGE_4: 
-      return {...state, '4': action.payload}
-    case CHANGE_5: 
-      return {...state, '5': action.payload}
+      return { ...state, fullName: action.payload }
+    case CHANGE_SIZE:
+      return { ...state, size: action.payload }
+    case CHANGE_TOP:
+      const { name, checked } = action.payload
+      return { ...state, [name]: checked }
+    case RESETFORM:
+    return {fullName: '', size: '', '1': false,'2': false,'3': false,'4': false,'5': false}
     default:
       return state
   }
 }
 
 export default function PizzaForm() {
- const [state, dispatch] = useReducer(reducer, initialFormState)
- const [createOrder, error, isLoading] = usePostAllOrdersMutation()
- console.log(error)
- const onNameChange = ({target: { value }})=>{
-   dispatch({type: CHANGE_FULLNAME, payload: value})
- }
- const onSizeChange = ({target: { value }})=>{
-  dispatch({type: CHANGE_SIZE, payload: value})
- }
- const on1Change = () =>{
-  dispatch({type: CHANGE_1, payload: 'Pepperoni'})
- }
- const on2Change = () =>{
-  dispatch({type: CHANGE_2, payload: 'Green Peppers'})
- }
- const on3Change = () =>{
-  dispatch({type: CHANGE_3, payload: 'Pineapple'})
- }
-  const on4Change = () =>{
-  dispatch({type: CHANGE_4, payload: 'Mushrooms'})
- }
- const on5Change = () =>{
-  dispatch({type: CHANGE_5, payload: 'Ham'})
- }
- const reset = evt => {}
+  const [state, dispatch] = useReducer(reducer, initialFormState)
+  const [createOrder, error, isLoading, isFetching] = usePostAllOrdersMutation()
+  
+  //console.log(error)
+
+  const onNameChange = ({ target: { value } }) => {
+    dispatch({ type: CHANGE_FULLNAME, payload: value })
+  }
+  const onSizeChange = ({ target: { value } }) => {
+    dispatch({ type: CHANGE_SIZE, payload: value })
+  }
+  const onTopChange = ({ target: { name, checked } }) => {
+    //console.log(name)
+    dispatch({ type: CHANGE_TOP, payload: { name, checked } })
+  }
+  const resetOrder = () =>{
+    dispatch({type: RESETFORM})
+  }
+  const onNewOrder = evt => {
+    evt.preventDefault()
+    const { fullName, size } = state
+    let keys = Object.keys(state)
+    let toppings = []
+    for (let i = 0; i < keys.length; i++) {
+      if (state[keys[i]] === true) {
+        toppings.push(keys[i])
+        state[keys[i]] = false
+      }
+    }
+    //console.log(toppings)
+    createOrder({ fullName, size, toppings })
+    resetOrder()
+    
+  }
+  const reset = evt => { }
+  //console.log(state) 
   return (
     <form>
       <h2>Pizza Form</h2>
-      {isLoading && <div className='pending'>Order in progress...</div>}
-      {error && <div className='failure'>Order failed: {error.status}</div>}
+      {(isLoading || isFetching)&& <div className='pending'>Order in progress...</div>}
+      {error.error && <div className='failure'>Order failed: {error.error.data.message}</div>}
 
       <div className="input-group">
         <div>
@@ -100,22 +103,22 @@ export default function PizzaForm() {
 
       <div className="input-group">
         <label>
-          <input data-testid="checkPepperoni" name="1" type="checkbox" checked={state.CHANGE_1} onChange={on1Change}/>
+          <input data-testid="checkPepperoni" name="1" type="checkbox" onChange={onTopChange} checked={state['1']} />
           Pepperoni<br /></label>
         <label>
-          <input data-testid="checkGreenpeppers" name="2" type="checkbox" checked={state.CHANGE_2} onChange={on2Change}/>
+          <input data-testid="checkGreenpeppers" name="2" type="checkbox" onChange={onTopChange} checked={state['2']}/>
           Green Peppers<br /></label>
         <label>
-          <input data-testid="checkPineapple" name="3" type="checkbox" checked={state.CHANGE_3} onChange={on3Change}/>
+          <input data-testid="checkPineapple" name="3" type="checkbox" onChange={onTopChange} checked={state['3']}/>
           Pineapple<br /></label>
         <label>
-          <input data-testid="checkMushrooms" name="4" type="checkbox" checked={state.CHANGE_4} onChange={on4Change}/>
+          <input data-testid="checkMushrooms" name="4" type="checkbox" onChange={onTopChange} checked={state['4']}/>
           Mushrooms<br /></label>
         <label>
-          <input data-testid="checkHam" name="5" type="checkbox" checked={state.CHANGE_5} onChange={on5Change}/>
+          <input data-testid="checkHam" name="5" type="checkbox" onChange={onTopChange} checked={state['5']}/>
           Ham<br /></label>
       </div>
-      <input data-testid="submit" type="submit" onClick={() => createOrder(state)}/>
+      <input data-testid="submit" type="submit" onClick={onNewOrder} />
     </form>
   )
 }

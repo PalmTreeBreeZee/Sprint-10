@@ -1,23 +1,25 @@
-import {createApi, fetchBaseQuery} from '@reduxjs/toolkit/query/react'
+import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
 
 export const pizzaSlice = createApi({
     reducerPath: 'pizzaSlice',
-    baseQuery: fetchBaseQuery({baseUrl: 'http://localhost:9009/api/pizza/'}),
-
+    baseQuery: fetchBaseQuery({ baseUrl: 'http://localhost:9009/api/pizza/' }),
+    tagTypes: ['Pizza'],
     endpoints: (builder) => ({
-    getAllOrders: builder.query({
-    query: () => 'history',  
-        }) ,
-    postAllOrders: builder.mutation({
-    query: (size, fullName, toppings) => ({
-        url: 'order',
-        method: 'POST',
-        body: {size, fullName, toppings},
+        getAllOrders: builder.query({
+            query: () => 'history',
+            providesTags: ['Pizza'],
+        }),
+        postAllOrders: builder.mutation({
+            query: (body) => ({
+                url: 'order',
+                method: 'POST',
+                body
 
-    })
-    })
+            }),
+            invalidatesTags: ['Pizza']
+        })
     }),
 })
 
-export const {useGetAllOrdersQuery, usePostAllOrdersMutation} = pizzaSlice;
+export const { useGetAllOrdersQuery, usePostAllOrdersMutation } = pizzaSlice;
 export default pizzaSlice;

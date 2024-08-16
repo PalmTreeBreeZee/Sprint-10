@@ -1,5 +1,6 @@
 import { configureStore } from '@reduxjs/toolkit'
 import {pizzaSlice} from './pizzaSlice'
+
 export const resetStore = () => configureStore({
   reducer: {
   [pizzaSlice.reducerPath]: pizzaSlice.reducer
