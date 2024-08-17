@@ -1,57 +1,35 @@
 import React from 'react'
-import { useReducer} from 'react'
+import { useReducer } from 'react'
 import { useGetAllOrdersQuery } from '../state/pizzaSlice'
 
+//let size = 'All'
 
+const CHANGE_ALL_FILTER = 'CHANGE_ALL_FILTER'
 
-  const CHANGE_ALL_FILTER = 'CHANGE_ALL_FILTER'
-
- const reducer = (state, action) => {
-  switch(action.type){
+const reducer = (state, action) => {
+  switch (action.type) {
     case CHANGE_ALL_FILTER:
-      return {}
+      return { ...state, size: action.payload }
     default:
       return state
   }
- }
- 
- 
+}
+
+
 export default function OrderList() {
- const {data, error, isLoading} = useGetAllOrdersQuery()
-  const [state, dispatch] = useReducer(reducer, data)
+  
+ 
   const [size, sizeState] = React.useState('All')
 
-if(isLoading) return <div>Loading...</div> 
-if(error) return <div>Error returning data</div>
-//if there is a filter applied lets filter the response
-//console.log(data)
-let arr = data
-
-const onClick = evt => {
-  sizeState(evt.target.value)
-}
-const filteredPizzas = data.filter(pizza =>{
-  if(size === 'All'){
-    return pizza
-  } else {
-    return pizza.size === size
+  const onClick = evt => {
+    //dispatch({type: CHANGE_ALL_FILTER, payload: evt.target.value})
+    sizeState(evt.target.value)
   }
-})
-return (
+
+  return (
     <div id="orderList">
       <h2>Pizza Orders</h2>
-      <ol>
-        {
-          filteredPizzas.map((order) => {
-            return (
-              <li key={order.id}>
-                <div>
-                 {order.customer} ordered a size {order.size} with {order.toppings.length} toppings </div>
-              </li>
-            )
-          })
-              }
-      </ol>
+      <Test size={size}/>
       <div id="sizeFilters">
         Filter by size:
         {
@@ -63,12 +41,40 @@ return (
               className={className}
               key={sizes}
               onClick={onClick}
-              value= {sizes}
-            
-              >{sizes}</button>
+              value={sizes}
+
+            >{sizes}</button>
           })
         }
       </div>
     </div>
   )
+}
+function Test({size}) {
+  const { data, error, isLoading } = useGetAllOrdersQuery()
+  if (error) return <div>{error.message}</div>
+  if (isLoading) return <div>loading....</div>
+  const filteredPizzas = data.filter(pizza => {
+    if (size === 'All') {
+      return pizza
+    } else {
+      return pizza.size === size
+    }
+  })
+  return (<ol>
+    {
+      filteredPizzas.map((order) => {
+        console.log(order.length)
+        return (
+          <li key={order.id}>
+            <div>
+              {order.customer} ordered a size {order.size} with{' '}
+              {(order.toppings === undefined) ? 'no' : order.toppings.length}{' '}
+              topping{(order.toppings?.length === 1) ? '' : 's'}
+            </div>
+          </li>
+        )
+      })
+    }
+  </ol>)
 }

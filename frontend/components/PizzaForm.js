@@ -33,9 +33,8 @@ const reducer = (state, action) => {
 
 export default function PizzaForm() {
   const [state, dispatch] = useReducer(reducer, initialFormState)
-  const [createOrder, error, isLoading, isFetching] = usePostAllOrdersMutation()
-  
-  //console.log(error)
+  const [createOrder, error] = usePostAllOrdersMutation()
+  const {isLoading, isFetching}= useGetAllOrdersQuery()
 
   const onNameChange = ({ target: { value } }) => {
     dispatch({ type: CHANGE_FULLNAME, payload: value })
@@ -71,7 +70,7 @@ export default function PizzaForm() {
   return (
     <form>
       <h2>Pizza Form</h2>
-      {(isLoading || isFetching)&& <div className='pending'>Order in progress...</div>}
+      {(isFetching === true && isLoading === false) && <div className='pending'>Order in progress...</div>}
       {error.error && <div className='failure'>Order failed: {error.error.data.message}</div>}
 
       <div className="input-group">
